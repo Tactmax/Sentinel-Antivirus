@@ -1,0 +1,140 @@
+<UserControl x:Class="Sentinel.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+        <StackPanel>
+            <TextBlock Text="Settings" FontSize="26" FontWeight="SemiBold"/>
+            <TextBlock Text="Engine location, scan behaviour, and data management."
+                       Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,4,0,18"/>
+
+            <!-- Engine -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="ClamAV engine" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="EngineStatusLabel" Text="" Foreground="{StaticResource MutedBrush}" Margin="0,5,0,12"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="EnginePathBox" Tag="Path to clamscan.exe" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Browse…" Click="BrowseEngine_Click" Margin="9,0,0,0" VerticalAlignment="Center"/>
+                        <Button Grid.Column="2" Content="Validate &amp; save" Click="ValidateEngine_Click" Margin="9,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Install official ClamAV engine" Click="InstallEngine_Click"
+                                ToolTip="Download the portable package from the Cisco Talos GitHub release"/>
+                        <Button Content="Download signatures" Click="UpdateSignatures_Click" Margin="9,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Scan options -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Scan options" FontSize="16" FontWeight="SemiBold"/>
+
+                    <CheckBox x:Name="BackgroundEngineBox" Content="Keep the scan engine running in the background"
+                              Foreground="{StaticResource TextPrimaryBrush}" Margin="0,12,0,0" Checked="Option_Changed" Unchecked="Option_Changed"/>
+                    <TextBlock Text="ClamAV reloads and verifies the entire signature database on every scan — around a minute each time. A resident engine does it once and then answers each scan in milliseconds. Uses roughly 500 MB of memory while it is running."
+                               Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="27,3,0,0" TextWrapping="Wrap"/>
+
+                    <CheckBox x:Name="ScanArchivesBox" Content="Scan inside archives (ZIP, CAB, installer packages…)"
+                              Foreground="{StaticResource TextPrimaryBrush}" Margin="0,16,0,0" Checked="Option_Changed" Unchecked="Option_Changed"/>
+                    <TextBlock Text="Archive scanning is slower but much safer to leave enabled."
+                               Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="27,3,0,0"/>
+
+                    <CheckBox x:Name="ParallelScanBox" Content="Split large folders across several ClamAV processes (fallback only)"
+                              Foreground="{StaticResource TextPrimaryBrush}" Margin="0,16,0,0" Checked="Option_Changed" Unchecked="Option_Changed"/>
+                    <TextBlock Text="Only used when the background engine is unavailable. Every extra process loads the whole signature database again, so this costs about a minute per worker and only pays off on very large trees."
+                               Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="27,3,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Limits -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Limits (advanced)" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="Leave blank to use ClamAV's own defaults. These are safety valves, not tuning knobs — raising a limit scans more data, not less."
+                               Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="0,5,0,14" TextWrapping="Wrap"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Parallel workers" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBox x:Name="ParallelWorkersBox" Grid.Column="1" Width="86" Tag="auto"
+                                 TextChanged="Option_TextChanged" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="blank = auto" Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Skip files larger than" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBox x:Name="MaxFileSizeBox" Grid.Column="1" Width="86" Tag="0"
+                                 TextChanged="Option_TextChanged" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="MB · 0 = no limit" Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Max bytes scanned per file" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBox x:Name="MaxScanSizeBox" Grid.Column="1" Width="86" Tag="0"
+                                 TextChanged="Option_TextChanged" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="MB · 0 = default" Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Max time per file" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBox x:Name="MaxScanTimeBox" Grid.Column="1" Width="86" Tag="0"
+                                 TextChanged="Option_TextChanged" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="ms · 0 = default" Foreground="{StaticResource MutedBrush}" FontSize="11.5" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Data -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Data" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="Sentinel stores its settings, scan history, and encrypted quarantine under:" Foreground="{StaticResource MutedBrush}" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="DataPathText" Text="" FontFamily="Consolas" FontSize="12" Margin="0,6,0,0"
+                               TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Open data folder" Click="OpenDataFolder_Click"/>
+                        <Button Content="Clear scan history" Click="ClearHistory_Click" Margin="9,0,0,0"/>
+                        <Button Content="Delete ALL quarantine" Style="{StaticResource DangerButton}" Click="PurgeQuarantine_Click" Margin="9,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- About -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="About" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="Sentinel Antivirus 1.3.0 — a ClamAV-based scanner for Windows 10 and 11." Margin="0,7,0,0"/>
+                    <TextBlock Text="Sentinel is an on-demand scanner, not a full real-time protection suite. ClamAV focuses on malware detection and does not provide complete Windows exploit mitigation, firewall, or web protection. Keep Microsoft Defender (or another real-time product) enabled alongside Sentinel."
+                               Foreground="{StaticResource MutedBrush}" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                    <TextBlock Text="Engine packages are downloaded only from the official Cisco Talos ClamAV releases (github.com/Cisco-Talos/clamav) published via clamav.net."
+                               Foreground="{StaticResource MutedBrush}" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,12 @@
+<!-- Shared project defaults. Imported automatically by MSBuild for every project
+     below this folder, so individual .csproj files only declare what differs. -->
+<Project>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

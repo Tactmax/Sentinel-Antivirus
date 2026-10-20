@@ -1,0 +1,14 @@
+Sentinel is an on-demand malware scanner powered by ClamAV.
+
+This installer does not include the ClamAV engine. On first run, Sentinel
+offers a one-click install that downloads the official ClamAV Windows package
+published by Cisco Talos on GitHub and verifies its SHA-256 digest against the
+GitHub release metadata before extracting it.
+
+Sentinel is not a replacement for real-time protection. Keep Microsoft
+Defender (or another antivirus product) enabled while using it.
+
+Uninstalling Sentinel removes the application only. Your quarantine, scan
+history, settings and downloaded engine are kept in
+%LOCALAPPDATA%\Sentinel. Run the uninstaller with the /PURGE switch to
+remove that folder as well.

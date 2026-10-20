@@ -1,0 +1,332 @@
+<UserControl x:Class="Sentinel.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Sentinel">
+    <UserControl.Resources>
+        <local:OutcomeToBrushConverter x:Key="OutcomeToBrush"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+        <StackPanel>
+            <!-- Header -->
+            <Grid Margin="2,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Dashboard" FontSize="26" FontWeight="SemiBold"/>
+                    <TextBlock Text="The health of your scanner at a glance." Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Open scanner" Click="GoToScan_Click" VerticalAlignment="Center"/>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ================= Left column ================= -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource SectionLabel}" Text="SECURITY"/>
+
+                    <Border Style="{StaticResource Card}" Padding="6">
+                        <StackPanel>
+                            <!-- Scanner -->
+                            <Grid Margin="12,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="38" Height="38" CornerRadius="10" Background="#122A21" VerticalAlignment="Center">
+                                    <Path Style="{StaticResource Icon}" Data="{StaticResource IconShield}" Stroke="{StaticResource AccentBrush}"
+                                          Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="13,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Scanner" FontSize="14.5" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="ScannerRowDetail" Text="Checking…" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="12" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <Grid Grid.Column="2" VerticalAlignment="Center">
+                                    <Border x:Name="ScannerStatusChip" Style="{StaticResource Badge}" Background="#122A21"
+                                            HorizontalAlignment="Right">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse x:Name="ScannerDot" Width="7" Height="7" VerticalAlignment="Center"
+                                                     Margin="0,0,7,0" Fill="{StaticResource MutedBrush}"/>
+                                            <TextBlock x:Name="ScannerRowStatus" Text="—" FontSize="11.5" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource AccentBrush}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+
+                            <!-- Engine install actions and progress -->
+                            <StackPanel x:Name="EngineActionPanel" Margin="12,0,12,12" Visibility="Collapsed">
+                                <StackPanel x:Name="EngineMissingPanel" Orientation="Horizontal" Margin="0,0,0,10">
+                                    <Button x:Name="InstallEngineButton" Style="{StaticResource AccentButton}"
+                                            Content="Install ClamAV engine" Click="InstallEngine_Click" Padding="15,7" FontSize="12.5"/>
+                                    <Button Content="I already have ClamAV…" Click="HaveClamAv_Click"
+                                            Style="{StaticResource GhostButton}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Grid x:Name="InstallPanel" Visibility="Collapsed">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ProgressBar x:Name="EngineInstallProgress" Height="6" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="EngineInstallText" Grid.Column="1" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="11.5" Margin="10,0,0,0" VerticalAlignment="Center"
+                                               MaxWidth="230" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource Divider}" Margin="12,0"/>
+
+                            <!-- Virus definitions -->
+                            <Grid Margin="12,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="38" Height="38" CornerRadius="10" Background="#12242F" VerticalAlignment="Center">
+                                    <Path Style="{StaticResource Icon}" Data="{StaticResource IconDatabase}" Stroke="{StaticResource InfoBrush}"
+                                          Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="13,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Virus definitions" FontSize="14.5" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="DefsRowDetail" Text="—" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="12" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <Grid Grid.Column="2" VerticalAlignment="Center">
+                                    <Border x:Name="DefsStatusChip" Style="{StaticResource Badge}" Background="#12242F"
+                                            HorizontalAlignment="Right" Visibility="Collapsed">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse x:Name="DefsDot" Width="7" Height="7" VerticalAlignment="Center"
+                                                     Margin="0,0,7,0" Fill="{StaticResource AccentBrush}"/>
+                                            <TextBlock x:Name="DefsRowStatus" Text="Up to date" FontSize="11.5" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource AccentBrush}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Button x:Name="UpdateDefsRowButton" Content="Update"
+                                            Style="{StaticResource AccentButton}" Padding="13,6" FontSize="12"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="UpdateDefsRow_Click"/>
+                                </Grid>
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" Margin="12,0"/>
+
+                            <!-- Quarantine -->
+                            <Grid Margin="12,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="38" Height="38" CornerRadius="10" Background="#2B2028" VerticalAlignment="Center">
+                                    <Path Style="{StaticResource Icon}" Data="{StaticResource IconQuarantine}" Stroke="{StaticResource WarningBrush}"
+                                          Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="13,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Quarantine" FontSize="14.5" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="QuarantineRowDetail" Text="—" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="12" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="View" Padding="12,5" FontSize="12"
+                                        VerticalAlignment="Center" Click="GoToQuarantine_Click"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Start a scan -->
+                    <TextBlock Style="{StaticResource SectionLabel}" Text="START A SCAN" Margin="0,20,0,0"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource TileButton}" Click="QuickScan_Click" MinHeight="70">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconScan}" Stroke="{StaticResource AccentBrush}"
+                                              Width="22" Height="22" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" Margin="13,0,0,0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Quick scan" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBlock Text="›" Foreground="{StaticResource MutedBrush}" FontSize="18"
+                                                           Margin="7,-2,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Text="Downloads, Desktop and Documents" Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="11.5" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="FullScan_Click" MinHeight="70">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconFolder}" Stroke="{StaticResource InfoBrush}"
+                                              Width="22" Height="22" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" Margin="13,0,0,0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Full scan" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBlock Text="›" Foreground="{StaticResource MutedBrush}" FontSize="18"
+                                                           Margin="7,-2,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Text="Everything on the C: drive — slow" Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="11.5" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </Grid>
+
+                            <Grid Margin="0,11,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TargetBox" Tag="…or type a path here and press Enter"
+                                         VerticalAlignment="Center" KeyDown="TargetBox_KeyDown"/>
+                                <Button Grid.Column="1" Content="Scan…" Click="ScanTarget_Click" Margin="10,0,0,0" MinWidth="96" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- ================= Right column ================= -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Style="{StaticResource SectionLabel}" Text="PROTECTION STATUS"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Gauge -->
+                            <Grid Grid.Row="0" Width="150" Height="150" HorizontalAlignment="Center">
+                                <Ellipse Width="150" Height="150" Stroke="{StaticResource InputBrush}" StrokeThickness="12"/>
+                                <Ellipse x:Name="ScoreArc" Width="150" Height="150" Stroke="{StaticResource ScoreGradientBrush}"
+                                         StrokeThickness="12" StrokeDashArray="0 1000"
+                                         StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                         RenderTransformOrigin="0.5,0.5">
+                                    <Ellipse.RenderTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="ScoreValue" Text="—" FontSize="34" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="ScoreLabel" Text="Checking…" FontSize="12.5"
+                                               Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Breakdown -->
+                            <StackPanel Grid.Row="1" Margin="0,16,0,2">
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Engine installed" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5"/>
+                                    <TextBlock x:Name="BreakEngine" Grid.Column="1" Text="—" FontSize="12.5" Foreground="{StaticResource MutedBrush}"/>
+                                </Grid>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Definitions current" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5"/>
+                                    <TextBlock x:Name="BreakDefs" Grid.Column="1" Text="—" FontSize="12.5" Foreground="{StaticResource MutedBrush}"/>
+                                </Grid>
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Quarantine readable" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12.5"/>
+                                    <TextBlock x:Name="BreakQuarantine" Grid.Column="1" Text="—" FontSize="12.5" Foreground="{StaticResource MutedBrush}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Recent activity -->
+                    <TextBlock Style="{StaticResource SectionLabel}" Text="RECENT ACTIVITY" Margin="0,20,0,0"/>
+
+                    <Border Style="{StaticResource Card}" Padding="16">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Margin="2,0,2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Recent scans" FontSize="14.5" FontWeight="SemiBold"/>
+                                <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="View all →" Click="ViewHistory_Click"/>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="2,8,2,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="TARGET" Foreground="{StaticResource MutedBrush}" FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="WHEN" Foreground="{StaticResource MutedBrush}" FontSize="10" FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ItemsControl x:Name="RecentList" Grid.Row="2" Margin="0,6,0,0"
+                                          ItemsSource="{Binding RecentSessions, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,9">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Style="{StaticResource Badge}"
+                                                            Background="{Binding Outcome, Converter={StaticResource OutcomeToBrush}}">
+                                                        <TextBlock Text="{Binding Outcome}" FontSize="10" FontWeight="SemiBold" Foreground="#08110C"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Target}" FontSize="12.5" Margin="9,0,0,0"
+                                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding Target}" MaxWidth="230"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1" Text="{Binding StartedLocal}" Foreground="{StaticResource MutedBrush}"
+                                                           FontSize="11.5" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock x:Name="RecentEmptyHint" Grid.Row="2" Text="No scans yet — run a Quick scan to get started."
+                                       Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       TextWrapping="Wrap" Margin="20,26" Visibility="Collapsed"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

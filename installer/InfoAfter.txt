@@ -1,0 +1,11 @@
+Sentinel is installed and ready.
+
+On first run, the Dashboard will offer to install the ClamAV engine. That
+downloads the official package and verifies its SHA-256 digest. You will then
+be prompted to fetch virus signatures (a large first download).
+
+After that, try a Quick scan from the Scan page - it covers Downloads, Desktop
+and Documents, and splits large folders across several engine processes for
+speed. Everything Sentinel has ever detected is listed on the Threats page.
+
+Sentinel is on-demand only. Keep Microsoft Defender enabled.
